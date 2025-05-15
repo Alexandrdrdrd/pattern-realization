@@ -1,3 +1,3 @@
 package com.example.apigateway.dto;
 
-public record InventoryResponse(Long orderId, boolean inStock, int availableQuantity) {}
+public record InventoryResponse(Long id, String name, Integer quantity, Double price) {}

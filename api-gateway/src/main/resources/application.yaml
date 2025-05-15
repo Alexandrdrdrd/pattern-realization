@@ -1,13 +1,24 @@
+# Базовые настройки сервера
 server:
   port: 8080
 
+# Настройки приложения
 spring:
   application:
     name: api-gateway
-
+  
+  # Настройки Spring Cloud Gateway
   cloud:
     gateway:
+      # Включение обнаружения сервисов
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      
+      # Конфигурация маршрутов
       routes:
+        # Маршрут к сервису заказов
         - id: order-service
           uri: lb://order-service
           predicates:
@@ -17,7 +28,8 @@ spring:
               args:
                 name: orderCircuitBreaker
                 fallbackUri: forward:/fallback/orders
-
+        
+        # Маршрут к сервису инвентаря
         - id: inventory-service
           uri: lb://inventory-service
           predicates:
@@ -27,30 +39,63 @@ spring:
               args:
                 name: inventoryCircuitBreaker
                 fallbackUri: forward:/fallback/inventory
+        
+        # Маршрут для собственного API
+        - id: api-gateway-controller
+          uri: lb://api-gateway
+          predicates:
+            - Path=/api/composed-order/**
 
-    discovery:
-      locator:
-        enabled: true
-        lower-case-service-id: true
-
+# Настройки Eureka
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
     register-with-eureka: true
     fetch-registry: true
-
+  instance:
+    prefer-ip-address: true
 
 resilience4j:
   circuitbreaker:
     instances:
-      orderService:
-        register-health-indicator: true
-        sliding-window-size: 5
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
       inventoryService:
-        register-health-indicator: true
-        sliding-window-size: 5
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 2
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+      orderService:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 2
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+  retry:
+    instances:
+      inventoryService:
+        maxAttempts: 2
+        waitDuration: 100ms
+        retryExceptions:
+          - java.lang.IllegalStateException
+          - java.io.IOException
+          - org.springframework.web.client.ResourceAccessException
+      orderService:
+        maxAttempts: 2
+        waitDuration: 100ms
+        retryExceptions:
+          - java.lang.IllegalStateException
+          - java.io.IOException
+
+# Настройки логирования
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.netty: DEBUG
+    com.example.apigateway: DEBUG

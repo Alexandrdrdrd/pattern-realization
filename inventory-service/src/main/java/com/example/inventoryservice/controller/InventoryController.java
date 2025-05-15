@@ -1,9 +1,13 @@
 package com.example.inventoryservice.controller;
 
 import com.example.inventoryservice.model.InventoryItem;
-import com.example.inventoryservice.model.Order;
-import com.example.inventoryservice.service.InventoryService;
+
+import com.example.inventoryservice.repository.InventoryItemRepository;
+import java.util.Optional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,19 +17,25 @@ import java.util.List;
 @RequestMapping("/inventory")
 public class InventoryController {
 
-    private final InventoryService inventoryService;
+    private final InventoryItemRepository inventoryItemRepository;
 
-    public InventoryController(InventoryService inventoryService) {
-        this.inventoryService = inventoryService;
+    public InventoryController(InventoryItemRepository inventoryItemRepository) {
+        this.inventoryItemRepository = inventoryItemRepository;
     }
 
     @GetMapping("/items")
     public List<InventoryItem> getAllInventoryItems() {
-        return inventoryService.getAllInventoryItems();
+        return inventoryItemRepository.findAll();
     }
 
-    @GetMapping("/orders")
-    public List<Order> getAllOrders() {
-        return inventoryService.getAllOrders();
+    @PostMapping("/items")
+    public InventoryItem saveInventoryItems(@RequestBody InventoryItem inventoryItem) {
+        return inventoryItemRepository.save(inventoryItem);
     }
+
+    @GetMapping("/items/{id}")
+    public Optional<InventoryItem> getInventoryItemById(@PathVariable Long id) {
+        return inventoryItemRepository.findById(id);
+    }
+
 }
