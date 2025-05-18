@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/fallback")
 public class FallbackController {
 
-    @GetMapping("/orders")
-    public ResponseEntity<String> ordersFallback() {
-        return ResponseEntity.ok("Order Service is currently unavailable. Please try again later.");
+    @GetMapping("/suppliers")  // новый endpoint
+    public ResponseEntity<String> suppliersFallback() {
+        return ResponseEntity.ok("Supplier Service is currently unavailable. Please try again later.");
     }
 
     @GetMapping("/inventory")
