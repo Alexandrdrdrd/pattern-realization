@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: order-service
+    name: supplier-service
 
   datasource:
     url: jdbc:postgresql://localhost:5432/shared_db
