@@ -19,15 +19,15 @@ spring:
       # Конфигурация маршрутов
       routes:
         # Маршрут к сервису заказов
-        - id: order-service
-          uri: lb://order-service
+        - id: supplier-service
+          uri: lb://supplier-service
           predicates:
-            - Path=/api/orders/**
+            - Path=/api/suppliers/**
           filters:
             - name: CircuitBreaker
               args:
-                name: orderCircuitBreaker
-                fallbackUri: forward:/fallback/orders
+                name: supplierCircuitBreaker
+                fallbackUri: forward:/fallback/suppliers
         
         # Маршрут к сервису инвентаря
         - id: inventory-service

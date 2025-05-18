@@ -6,17 +6,16 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "orders")
-public class Order {
+@Table(name = "suppliers")
+public class Supplier {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String customer;
+    private String name;
 
     private Double amount;
 
     private LocalDateTime createdAt = LocalDateTime.now();
-
 }
